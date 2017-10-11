@@ -1,3 +1,7 @@
+# Setting files
+.DS_Store
+*.project
+*.settings/
 # Compiled class file
 *.class
 
