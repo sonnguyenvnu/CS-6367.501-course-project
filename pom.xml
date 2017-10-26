@@ -16,8 +16,10 @@
     <module>data</module>
     <module>method-coverage</module>
     <module>preprocess</module>
-    <module>evaluation</module>
+    
     <module>configuration</module>
+    <module>evaluation</module>
+    <module>fault-localization</module>
   </modules>
 
   <prerequisites>
