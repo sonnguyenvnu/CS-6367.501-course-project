@@ -15,6 +15,9 @@
   <modules>
     <module>data</module>
     <module>method-coverage</module>
+    <module>preprocess</module>
+    <module>evaluation</module>
+    <module>configuration</module>
   </modules>
 
   <prerequisites>
