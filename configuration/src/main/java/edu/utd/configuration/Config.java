@@ -4,7 +4,7 @@ public interface Config {
 	/**
 	 * Data folder
 	 */
-	public static String DATA = "/Users/sonnguyen/Workspace/2017/Data";
+	public static String DATA = "/Users/sonnguyen/Workspace/2017/time_buggy";
 	/**
 	 * Junit version
 	 */

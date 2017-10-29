@@ -20,6 +20,7 @@
     <module>configuration</module>
     <module>evaluation</module>
     <module>fault-localization</module>
+    <module>utils</module>
   </modules>
 
   <prerequisites>

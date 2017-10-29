@@ -1,11 +1,10 @@
 package edu.utd.preprocess;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import edu.utd.configuration.Config;
+import edu.utd.testing.utils.Utils;
 
 /**
  * Preprocessor The main purpose of Preprocessor is that updating pom.xlm in
@@ -50,14 +50,10 @@ public class PreProcessor {
 	 * pom.xml object
 	 */
 	private Document pom;
-	/**
-	 * 
-	 */
-	private String triggers;
 
 	public static void main(String[] args)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException {
-		for (int i = 6; i <= 27; i++) {
+		for (int i = 1; i <= 27; i++) {
 			System.out.println(Config.DATA + "/time_bug_" + i);
 			PreProcessor preProcessor = new PreProcessor(Config.DATA + "/time_bug_" + i);
 			preProcessor.process();
@@ -76,42 +72,31 @@ public class PreProcessor {
 	public void process() throws ParserConfigurationException, SAXException, IOException, TransformerException {
 		updateSureFireVersion();
 		updateJUnitVersion();
-		triggers = extractTriggerFromFailingTest();
+//		String triggers = Utils.extractTriggerFromFailingTest(dataPath);
+		List<String> triggers = Utils.extractTriggerFromFailingTest(dataPath);
 		// triggers = extractTriggerFromDefect4J();
-
-		updateSureFireConfiguration(triggers);
-		write(getFileByName(dataPath, "pom.xml"), true);
+		
+		updateSureFireConfiguration(getConfigTriggers(triggers));
+		write(Utils.getFileByName(dataPath, "pom.xml"), true);
 	}
 
-	/**
-	 * Get file path by name in specific folder
-	 * 
-	 * @param path
-	 *            specific folder
-	 * @param fileName
-	 *            the name of file need to find
-	 * @return absolute path of the file need to find
-	 */
-	private String getFileByName(String path, String fileName) {
-		String pom = null;
-		File project = new File(path);
-		if (project.isDirectory()) {
-			File[] children = project.listFiles();
-			for (File child : children) {
-				if (child.getName().equals(fileName)) {
-					pom = child.getAbsolutePath();
-					break;
-				}
-			}
+
+	private String getConfigTriggers(List<String> triggers) {
+		String ts = "";
+		for (String t : triggers) {
+			t = t.replace(".", "/").replace("::", "#");
+			if (ts.isEmpty())
+				ts = t;
+			else
+				ts = ts+ ", " + t;
 		}
-		return pom;
+		return ts;
 	}
 
 	/**
 	 * Update testing scope in surefire configuration by trigger
 	 * 
-	 * @param trigger
-	 *            trigger extracted from defect4j.properties file
+	 * @param trigger trigger extracted from defect4j.properties file
 	 */
 	private void updateSureFireConfiguration(String trigger) {
 		NodeList dependencies = pom.getElementsByTagName("plugin");
@@ -125,6 +110,7 @@ public class PreProcessor {
 					if (config != null && config.getNodeType() == Node.ELEMENT_NODE) {
 						config.setTextContent("");
 						Node test = pom.createElement("test");
+						System.out.println(trigger);
 						test.setTextContent(trigger);
 						config.appendChild(test);
 						Node argLine = pom.createElement("argLine");
@@ -139,29 +125,6 @@ public class PreProcessor {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Extract trigger from defect4j file
-	 * 
-	 * @return trigger (format: package/testclassname#testmethod
-	 */
-	private String extractTriggerFromDefect4J() {
-		String defect4j = getFileByName(dataPath, Config.DEFECT4J_PROTERTIES);
-		String trigger = null;
-		try (BufferedReader br = new BufferedReader(new FileReader(defect4j))) {
-			String sCurrentLine;
-			while ((sCurrentLine = br.readLine()) != null) {
-				if (sCurrentLine.contains("d4j.tests.trigger=")) {
-					trigger = sCurrentLine.replace("d4j.tests.trigger=", "").replace(".", "/").replace("::", "#");
-					break;
-				}
-			}
-			System.out.println(trigger);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return trigger;
 	}
 
 	/**
@@ -198,7 +161,7 @@ public class PreProcessor {
 	 */
 	public PreProcessor(String dataPath) {
 		this.dataPath = dataPath;
-		String pomFile = getFileByName(dataPath, "pom.xml");
+		String pomFile = Utils.getFileByName(dataPath, "pom.xml");
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder;
 		try {
@@ -214,10 +177,8 @@ public class PreProcessor {
 	/**
 	 * Write updated pom file back buggy project path
 	 * 
-	 * @param pomPath
-	 *            pom path
-	 * @param backup
-	 *            need to backup the original pom file
+	 * @param pomPath pom path
+	 * @param backup need to backup the original pom file
 	 * @throws TransformerException
 	 * @throws IOException
 	 */
@@ -231,29 +192,5 @@ public class PreProcessor {
 		DOMSource source = new DOMSource(pom);
 		StreamResult result = new StreamResult(p);
 		transformer.transform(source, result);
-	}
-
-	public String extractTriggerFromFailingTest() {
-		String defect4j = getFileByName(dataPath, Config.FAILING_TEST_FILE);
-		String trigger = null;
-		try (BufferedReader br = new BufferedReader(new FileReader(defect4j))) {
-			String sCurrentLine;
-			while ((sCurrentLine = br.readLine()) != null) {
-				if (sCurrentLine.contains("--- ")) {
-					if (trigger == null)
-						trigger = sCurrentLine.replace("--- ", "").replace(".", "/").replace("::", "#");
-					else
-						trigger += ", " + sCurrentLine.replace("--- ", "").replace(".", "/").replace("::", "#");
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println(trigger);
-		return trigger;
-	}
-
-	public String getTrigger() {
-		return triggers;
 	}
 }

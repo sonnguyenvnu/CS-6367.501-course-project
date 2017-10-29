@@ -5,16 +5,11 @@
     <artifactId>course-project</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>fault-localization</artifactId>
+  <artifactId>utils</artifactId>
   <dependencies>
   	<dependency>
   		<groupId>course-project</groupId>
   		<artifactId>configuration</artifactId>
-  		<version>0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>course-project</groupId>
-  		<artifactId>utils</artifactId>
   		<version>0.1-SNAPSHOT</version>
   	</dependency>
   </dependencies>

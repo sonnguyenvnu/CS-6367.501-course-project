@@ -1,12 +1,11 @@
 package edu.utd.localization;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import edu.utd.configuration.Config;
+import edu.utd.testing.utils.Utils;
 
 /**
  * FaultLocaltor is implemented the first fault localization strategy 
@@ -29,38 +28,76 @@ public class FaultLocator {
 	 */
 	public static void localize(int bug) throws FileNotFoundException {
 		dataPath = Config.DATA + "/time_bug_"+bug;
-		String result = getResultContent(dataPath + "/result.txt");
+		List<String> triggers = Utils.extractTriggerFromFailingTest(dataPath);
+		String result = Utils.getResultContent(dataPath + "/result.txt");
+		
 		int start = 0;
 		int end = 0;
 		StringBuffer postResult = new StringBuffer();
 		String methods;
+		
 		while(true){
 			start = result.indexOf("Running ", end);
 			end = result.indexOf("Tests run: ", start);
 			if(start == -1 || end == -1)
 				break;
 			methods = result.substring(start, end);
-			methods = eliminateReplicateMethod(methods);
-			postResult.append(methods).append("\n");
+			postResult.append(methods).append("---\n");
 		}
-		writeResult(postResult.toString());
+		result = updateResult(postResult.toString(), triggers);
+		result = refineResult(result);
+		writeResult(result);
+	}
+	private static String updateResult(String result, List<String> triggers) {
+		for (String trigger : triggers) {
+			trigger = trigger.replace("::", ".");
+			result = result.replace(trigger+"\n", "Running "+ trigger+"\n");
+		}
+		return result;
 	}
 	/**
 	 * Eliminate replicate methods in the result of each failing test
-	 * @param methods 
+	 * @param replicatedResult 
 	 * @return
 	 */
-	private static String eliminateReplicateMethod(String methods) {
+	private static String refineResult(String replicatedResult) {
 		StringBuffer result = new StringBuffer();
-		String[] methodsText = methods.trim().split("\n");
+		StringBuffer cl, mt;
 		int counter = -1;
-		for (String m : methodsText) {
-			if(!m.isEmpty() && result.indexOf(m)==-1){
-				result.append(m).append("\n");
-				counter++;
+		String[] calls;
+		String[] testMethods;
+		//Get list of test classes
+		String[] testClass = replicatedResult.trim().split("---");
+		//For each class
+		for (String tc : testClass) {
+			if(!tc.isEmpty()){
+				cl = new StringBuffer();
+				//Get list of test methods in this class
+				testMethods = tc.trim().split("Running ");
+				//For each method
+				for (String m : testMethods) {
+					if(!m.trim().isEmpty()){
+						mt = new StringBuffer();
+						m = m.trim();
+						//Get list of calls in this method
+						calls = m.split("\n");
+						//For each call
+						for (String call : calls) {
+							//TODO: Eliminate methods in test packages
+							if(!call.trim().isEmpty() && mt.indexOf(call)==-1){
+								mt.append(call).append("\n");
+								counter++;
+							}
+						}
+						cl.append(counter + "\nRunning " + mt).append("\n");
+						counter = 0;
+					}
+				}
+				result.append(cl).append("---\n");
 			}
 		}
-		return counter+"\n"+result.toString();
+		
+		return result.toString();
 	}
 	/**
 	 * Write post-processing result to file
@@ -71,23 +108,5 @@ public class FaultLocator {
 		try (PrintWriter out = new PrintWriter(dataPath + "/result1.txt")) {
 			out.println(result);
 		}
-	}
-	/**
-	 * Read the raw result
-	 * @param f the path of file containing raw result
-	 * @return raw result
-	 */
-	private static String getResultContent(String f) {
-		StringBuffer content = new StringBuffer();
-		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-			String sCurrentLine;
-			while ((sCurrentLine = br.readLine()) != null) {
-				if (!sCurrentLine.trim().isEmpty()) 
-					content.append(sCurrentLine).append("\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return content.toString();
 	}
 }
