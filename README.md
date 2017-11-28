@@ -43,7 +43,9 @@ Phosphor
     
 Expecting that `.phosphor/Phosphor/target/{jre-inst-implicit, jre-inst-int, jre-inst-obj}`
 #### Running my example with Phosphor
+
     - `./run_examples.sh PATH_TO_PHOSPHOR/Phosphor/target/`
+    
 Updating...
 
 Run my project
@@ -74,6 +76,7 @@ Expecting that:  `./method-coverage/target/method-coverage-0.1-SNAPSHOT.jar`
   
 The test result: `time_bug_x\result.txt`
 7. Run `FaultLocator.java` to get final result `time_bug_x\result_{1/2}.txt` (approach 1 or approach 2)
+
 Updating...
 
 
