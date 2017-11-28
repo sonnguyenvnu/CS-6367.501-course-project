@@ -63,6 +63,7 @@ Run my project
 Expecting that:  `./method-coverage/target/method-coverage-0.1-SNAPSHOT.jar`
 
 3. Run Defects4J test to extract failing tests:
+
  - `cd PROJECT_PATH`
  - `./defect4jtest`
  
@@ -74,8 +75,8 @@ Expecting that:  `./method-coverage/target/method-coverage-0.1-SNAPSHOT.jar`
   - `cd PROJECT_PATH`
   - `./maventest`
   
-The test result: `time_bug_x\result.txt`
-7. Run `FaultLocator.java` to get final result `time_bug_x\result_{1/2}.txt` (approach 1 or approach 2)
+The test result: `time_bug_x/result.txt`
+7. Run `FaultLocator.java` to get final result `time_bug_x/result_{1/2}.txt` (approach 1 or approach 2)
 
 Updating...
 
