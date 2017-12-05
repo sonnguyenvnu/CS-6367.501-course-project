@@ -56,7 +56,7 @@ public class PreProcessor {
 		for (int i = 1; i <= 27; i++) {
 			System.out.println(Config.DATA + "/time_bug_" + i);
 			PreProcessor preProcessor = new PreProcessor(Config.DATA + "/time_bug_" + i);
-			preProcessor.process();
+			preProcessor.process(Config.PHOSPHOR);
 		}
 
 	}
@@ -69,14 +69,14 @@ public class PreProcessor {
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
-	public void process() throws ParserConfigurationException, SAXException, IOException, TransformerException {
+	public void process(boolean phosphor) throws ParserConfigurationException, SAXException, IOException, TransformerException {
 		updateSureFireVersion();
 		updateJUnitVersion();
 //		String triggers = Utils.extractTriggerFromFailingTest(dataPath);
 		List<String> triggers = Utils.extractTriggerFromFailingTest(dataPath);
 		// triggers = extractTriggerFromDefect4J();
 		
-		updateSureFireConfiguration(getConfigTriggers(triggers));
+		updateSureFireConfiguration(getConfigTriggers(triggers), phosphor);
 		write(Utils.getFileByName(dataPath, "pom.xml"), true);
 	}
 
@@ -98,8 +98,11 @@ public class PreProcessor {
 	 * 
 	 * @param trigger trigger extracted from defect4j.properties file
 	 */
-	private void updateSureFireConfiguration(String trigger) {
+	private void updateSureFireConfiguration(String trigger, boolean phosphor) {
 		NodeList dependencies = pom.getElementsByTagName("plugin");
+		String agent = Config.AGENT_COMMAND;
+		if(phosphor)
+			agent = Config.AGENT_COMMAND_PHOSPHOR;
 		Element dependency = null;
 		for (int i = 0; i < dependencies.getLength(); i++) {
 			if (dependencies.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -109,12 +112,20 @@ public class PreProcessor {
 					Node config = dependency.getElementsByTagName("configuration").item(0);
 					if (config != null && config.getNodeType() == Node.ELEMENT_NODE) {
 						config.setTextContent("");
+						if(phosphor){
+							Node jvm = pom.createElement("jvm");
+							jvm.setTextContent(Config.JRE_PHOSPHOR);
+							config.appendChild(jvm);
+//							Node jvm = pom.createElement("jvm");
+//							jvm.setTextContent(Config.JRE_PHOSPHOR);
+//							config.appendChild(jvm);
+						}
 						Node test = pom.createElement("test");
 						System.out.println(trigger);
 						test.setTextContent(trigger);
 						config.appendChild(test);
 						Node argLine = pom.createElement("argLine");
-						argLine.setTextContent(Config.AGENT_COMMAND);
+						argLine.setTextContent(agent);
 						config.appendChild(argLine);
 					}
 					Node version = dependency.getElementsByTagName("version").item(0);

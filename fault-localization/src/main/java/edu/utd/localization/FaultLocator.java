@@ -29,7 +29,10 @@ public class FaultLocator {
 	public static void localize(int bug) throws FileNotFoundException {
 		dataPath = Config.DATA + "/time_bug_"+bug;
 		List<String> triggers = Utils.extractTriggerFromFailingTest(dataPath);
-		String result = Utils.getResultContent(dataPath + "/result.txt");
+		String resultPath = dataPath + "/result.txt";
+		if(Config.PHOSPHOR)
+			resultPath = dataPath + "/result_phosphor.txt";
+		String result = Utils.getResultContent(resultPath);
 		
 		int start = 0;
 		int end = 0;
@@ -105,7 +108,10 @@ public class FaultLocator {
 	 * @throws FileNotFoundException
 	 */
 	private static void writeResult(String result) throws FileNotFoundException {
-		try (PrintWriter out = new PrintWriter(dataPath + "/result1.txt")) {
+		String finalResult = dataPath + "/result1.txt";
+		if(Config.PHOSPHOR)
+			finalResult = dataPath + "/result2.txt";
+		try (PrintWriter out = new PrintWriter(finalResult)) {
 			out.println(result);
 		}
 	}

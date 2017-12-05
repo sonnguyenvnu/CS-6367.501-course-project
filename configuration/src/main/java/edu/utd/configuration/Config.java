@@ -18,7 +18,10 @@ public interface Config {
 	 * You need to modify the command by the following form after you compile method-coverage project:
 	 * -javaagent:"path_to_this_project"/CS-6367.501-course-project/method-coverage/target/method-coverage-0.1-SNAPSHOT.jar
 	 */
+	public static String PHOSPHOR_HOME = "/Users/sonnguyen/Workspace/2017/Tools/phosphor/Phosphor/target";
 	public static String AGENT_COMMAND = "-javaagent:/Users/sonnguyen/Workspace/2017/Program/CS-6367.501-course-project/method-coverage/target/method-coverage-0.1-SNAPSHOT.jar";
+	public static String AGENT_COMMAND_PHOSPHOR = "-Xbootclasspath/a:"+PHOSPHOR_HOME+"/Phosphor-0.0.3-SNAPSHOT.jar -javaagent:"+PHOSPHOR_HOME+"/Phosphor-0.0.3-SNAPSHOT.jar";
+	public static String JRE_PHOSPHOR = PHOSPHOR_HOME+"/jre-inst-obj/bin/java";
 	/**
 	 * The location you want to store methods' name collected by
 	 * MethodCollector. This cannot be implemented in Time because of the large
@@ -28,4 +31,6 @@ public interface Config {
 
 	public static String DEFECT4J_PROTERTIES = "defects4j.build.properties";
 	public static String FAILING_TEST_FILE = "failing_tests";
+	public static boolean PHOSPHOR = true;
+	public static int MAX_TARGET = 10;
 }
