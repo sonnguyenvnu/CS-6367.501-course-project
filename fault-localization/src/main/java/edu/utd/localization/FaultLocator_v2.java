@@ -18,13 +18,20 @@ import edu.utd.testing.utils.Utils;
  */
 public class FaultLocator_v2 {
 	static String dataPath;
+	static int calls = 0;
+	static int numOfmethods = 0;
+	static int numOfRmethods = 0;
+	static int numOfCases = 0;
 
 	public static void main(String[] args) throws FileNotFoundException {
-//		for (int i = 21; i <= 27; i++) {
-//			System.out.println("Start: " + i);
-//			localize(i);
-//		}
-		localize(27);
+		for (int i = 1; i <= 27; i++) {
+			System.out.println("Start: " + i);
+			localize(i);
+		}
+		System.out.println(numOfCases);
+		System.out.println(calls);
+		System.out.println(numOfmethods);
+		System.out.println(numOfRmethods);
 	}
 
 	/**
@@ -58,8 +65,19 @@ public class FaultLocator_v2 {
 		result = updateResult(postResult.toString(), triggers);
 		result = refineResult2(result, triggers);
 		System.out.println(result);
-		writeResult(result);
+		// writeResult(result);
+		writeResult2(result, bug);
 	}
+
+	private static void writeResult2(String result, int bug) {
+		String finalResult = "/Users/sonnguyen/Desktop/Experimental results/result_" + bug + ".txt";
+		try (PrintWriter out = new PrintWriter(finalResult)) {
+			out.println(result);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Eliminate replicate methods in the result of each failing test
 	 * 
@@ -78,9 +96,10 @@ public class FaultLocator_v2 {
 						List<Method> ms = DependencyFinder.extractMethods(methods);
 						List<Method> suspiciousSet = DependencyFinder.findSuspiciousSet(ms);
 						List<Method> suspiciousSet1 = DependencyFinder.findSuspiciousSet1(ms);
-						// System.out.println(ms.size() +
-						// "\t"+suspiciousSet1.size()+"\t" +
-						// suspiciousSet.size());
+						calls += ms.size();
+						numOfmethods += suspiciousSet1.size();
+						numOfRmethods += suspiciousSet.size();
+						numOfCases++;
 						r += (ms.size() + "\t\t" + suspiciousSet1.size() + "\t" + suspiciousSet.size() + "\n");
 					}
 				}
@@ -96,7 +115,6 @@ public class FaultLocator_v2 {
 		// }
 		return result;
 	}
-
 
 	private static Set<Method> extractSuspiciousSet(List<Method> targets, Set<Method> methods) {
 		Set<Method> result = new HashSet<Method>();
@@ -135,7 +153,7 @@ public class FaultLocator_v2 {
 	private static void writeResult(String result) throws FileNotFoundException {
 		String finalResult = dataPath + "/result1.txt";
 		if (Config.PHOSPHOR)
-			finalResult = dataPath+"/result2.txt";
+			finalResult = dataPath + "/result2.txt";
 		try (PrintWriter out = new PrintWriter(finalResult)) {
 			out.println(result);
 		}
