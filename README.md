@@ -38,13 +38,14 @@ Phosphor
    
    - `cd phosphor`
     - `mvn verify`
+    
 Expecting that `./phosphor/Phosphor/target/{jre-inst-implicit, jre-inst-int, jre-inst-obj, Phosphor-0.0.3-SNAPSHOT.jar}`.
 Note that because I have modified the original Phosphor to my customized version, to make sure that you get the same experimental result, you must use my version to run my project.
 #### Running my example with Phosphor
 I have created a simple example (as shown in the report) by reusing a Phosphor's example. To see the results of Methods' output Tainter, please execute `run_examples.sh`
 	
-	- `cd phosphor-examples`
-   	- `./run_examples.sh PATH_TO_PHOSPHOR/Phosphor/target/`
+   - `cd phosphor-examples`
+   - `./run_examples.sh PATH_TO_PHOSPHOR/Phosphor/target/`
     
 The expected results:
 
