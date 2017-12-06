@@ -8,6 +8,7 @@ Requirements
  - Perl >= 5.0.10
  - Git >= 1.9
  - SVN >= 1.8
+ - Only on Mac or Linux (Sorry Windows)
 Defects4J
 ----------------
 #### Setting up Defects4J (From https://github.com/rjust/defects4j)
@@ -21,64 +22,76 @@ Defects4J
 3. Add Defects4J's executables to your PATH:
     - `export PATH=$PATH:"path2defects4j"/framework/bin`
 #### Extracting buggy version of Time
-Only on Mac or Linux (Sorry Windows)
+0. Note that you can use buggy versions that I have already extracted by unzipping `time_buggy.zip` OR you definitely have to: 
+1. 
     - `cd PROJECT_PATH`
     
-Edit the location you want to save buggy version in  `defect4jcheckout.sh`
+2. Edit the location you want to save buggy version in  `defect4jcheckout.sh`
 
     - `./defect4jcheckout.sh`
     
 Phosphor 
 ----------------
 #### Setting up Phosphor (From https://github.com/gmu-swe/phosphor)
-1. Clone Phosphor
-    - Option 1: `git clone https://github.com/gmu-swe/phosphor.git`
-    
-    --> Then copy my code to the src folder
-    - Option 2:
-
+1. Unzip `phosphor.zip`
 2. Initialize 
     - `cd phosphor`
     - `mvn verify`
-    
-Expecting that `.phosphor/Phosphor/target/{jre-inst-implicit, jre-inst-int, jre-inst-obj}`
+Expecting that `./phosphor/Phosphor/target/{jre-inst-implicit, jre-inst-int, jre-inst-obj, Phosphor-0.0.3-SNAPSHOT.jar}`.
+Note that because I have modified the original Phosphor to my customized version, to make sure that you get the same experimental result, you must use my version to run my project.
 #### Running my example with Phosphor
-
+I have created a simple example (as shown in the report) by reusing a Phosphor's example. To see the results of Methods' output Tainter, please execute `run_examples.sh`
+	- `cd phosphor-examples`
     - `./run_examples.sh PATH_TO_PHOSPHOR/Phosphor/target/`
     
-Updating...
+The expected results:
+``
+Void: edu.utd.Test.<clinit>
+Void: edu.utd.Test.<init>
+Return: edu.utd.Test.getValue1
+Return: edu.utd.Test.getValue2
+Taint [lbl=edu.utd.Test.getValue2  deps = []]
+Return: edu.utd.Test.getValue3
+Taint [lbl=edu.utd.Test.getValue3  deps = []]
+Return: edu.utd.Test.getValue4
+Return: edu.utd.Test.getValue3
+Taint [lbl=null  deps = [edu.utd.Test.getValue1 edu.utd.Test.getValue3 ]]
+Return: edu.utd.Test.testMe
+Void: edu.utd.Test.main
+
+``
 
 Run my project
 ----------------
+
 1. Build customized Phosphor jar file
   - `cd PATH_TO_PHOSPHOR/Phosphor`
   - `mvn package`
   
-2. Go to `PROJECT_PATH` and configure the buggy project's location 
+2. Go to `PROJECT_PATH` and configure some options in `configuration/src/main/java/edu/utd/configuration/Config.java`:
+  - `DATA=YOUR_LOCATION_TO_TIME_BUGGY`
+  - `PHOSPHOR_HOME=YOUR_LOCALTION_TO_PHOSPHOR`
 
-3. Go to `PROJECT_PATH` and build the MethodCollector 
-  - `cd method-coverage`
-  - `mvn install`
-  
-Expecting that:  `./method-coverage/target/method-coverage-0.1-SNAPSHOT.jar`
+3. Run Defects4J test to extract failing tests. If you USED my buggy versions, you DO NOT need to run Defect4J test because I have run that step, you can se the result in each version in files `./time_buggy/time_bug_X/{all-tests.txt, failing_tests}`. If not, you need to do by the following steps:
 
-3. Run Defects4J test to extract failing tests:
-
- - `cd PROJECT_PATH`
+ - `cd PROJECT_PATH/shells`
+ - Modify the path to buggy versions in `defect4jtest.sh`
  - `./defect4jtest`
  
 4. Set up configurable variables in Config.java (`PHOSPHOR=false/true` if you want to run approach 1 or approach 2)
 
 5. Run PreProcess to update `pom.xml` files: Junit 4.11, Maven Surefire 2.19, and Java Agent
 
-6. Edit `maventest.sh` and run Maven test for all buggy version to collect test information
-  - `cd PROJECT_PATH`
-  - `./maventest`
-  
-The test result: `time_bug_x/result.txt`
-7. Run `FaultLocator.java` to get final result `time_bug_x/result_{1/2}.txt` (approach 1 or approach 2)
+6. Run Maven test for all buggy version to collect test information (if you do not use my buggy versions)
+  - `cd PROJECT_PATH/shells`
+  - Modify the path to buggy versions in `maventest_phosphor.sh`
+  - `./maventest_phosphor`
+Expecting that: `./time_buggy/time_bug_X/{result_phosphor.txt}`. `result_phosphor.txt` contains all method calls and their direct related methods (at a certain moment).
 
-Updating...
+7. Run class `edu.utd.localization.FaultLocator2` to have final result. Expecting that: `./time_buggy/time_bug_X/{result2.txt}`. `result2.txt` shows:
+	 - Each row is the results of a failing test
+	 - By collumns, the numbers of method calls, individual methods (the results of the first approach) and the number of methods after I applied the second approach
+	 For example: In the first failing test of the first buggy version, there ar 3077 method calls, and 258 methods executed, and there are 78 methods that actually relate to the failing test.
 
 
 
