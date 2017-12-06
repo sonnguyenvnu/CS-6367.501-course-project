@@ -13,21 +13,21 @@ Defects4J
 ----------------
 #### Setting up Defects4J (From https://github.com/rjust/defects4j)
 1. Clone Defects4J:
-    - `git clone https://github.com/rjust/defects4j`
+   
+   - `git clone https://github.com/rjust/defects4j`
 
 2. Initialize Defects4J (download the project repositories and external libraries, which are not included in the git repository for size purposes and to avoid redundancies):
-    - `cd defects4j`
+   
+   - `cd defects4j`
     - `./init.sh`
 
 3. Add Defects4J's executables to your PATH:
     - `export PATH=$PATH:"path2defects4j"/framework/bin`
 #### Extracting buggy version of Time
 0. Note that you can use buggy versions that I have already extracted by unzipping `time_buggy.zip` OR you definitely have to: 
-1. 
-    - `cd PROJECT_PATH`
     
-2. Edit the location you want to save buggy version in  `defect4jcheckout.sh`
-
+    - `cd PROJECT_PATH`
+    - Edit the location you want to save buggy version in  `defect4jcheckout.sh`
     - `./defect4jcheckout.sh`
     
 Phosphor 
@@ -35,18 +35,20 @@ Phosphor
 #### Setting up Phosphor (From https://github.com/gmu-swe/phosphor)
 1. Unzip `phosphor.zip`
 2. Initialize 
-    - `cd phosphor`
+   
+   - `cd phosphor`
     - `mvn verify`
 Expecting that `./phosphor/Phosphor/target/{jre-inst-implicit, jre-inst-int, jre-inst-obj, Phosphor-0.0.3-SNAPSHOT.jar}`.
 Note that because I have modified the original Phosphor to my customized version, to make sure that you get the same experimental result, you must use my version to run my project.
 #### Running my example with Phosphor
 I have created a simple example (as shown in the report) by reusing a Phosphor's example. To see the results of Methods' output Tainter, please execute `run_examples.sh`
+	
 	- `cd phosphor-examples`
-    - `./run_examples.sh PATH_TO_PHOSPHOR/Phosphor/target/`
+   	- `./run_examples.sh PATH_TO_PHOSPHOR/Phosphor/target/`
     
 The expected results:
-``
-Void: edu.utd.Test.<clinit>
+
+`Void: edu.utd.Test.<clinit>
 Void: edu.utd.Test.<init>
 Return: edu.utd.Test.getValue1
 Return: edu.utd.Test.getValue2
@@ -57,9 +59,7 @@ Return: edu.utd.Test.getValue4
 Return: edu.utd.Test.getValue3
 Taint [lbl=null  deps = [edu.utd.Test.getValue1 edu.utd.Test.getValue3 ]]
 Return: edu.utd.Test.testMe
-Void: edu.utd.Test.main
-
-``
+Void: edu.utd.Test.main`
 
 Run my project
 ----------------
@@ -83,15 +83,19 @@ Run my project
 5. Run PreProcess to update `pom.xml` files: Junit 4.11, Maven Surefire 2.19, and Java Agent
 
 6. Run Maven test for all buggy version to collect test information (if you do not use my buggy versions)
+  
   - `cd PROJECT_PATH/shells`
   - Modify the path to buggy versions in `maventest_phosphor.sh`
   - `./maventest_phosphor`
+
 Expecting that: `./time_buggy/time_bug_X/{result_phosphor.txt}`. `result_phosphor.txt` contains all method calls and their direct related methods (at a certain moment).
 
 7. Run class `edu.utd.localization.FaultLocator2` to have final result. Expecting that: `./time_buggy/time_bug_X/{result2.txt}`. `result2.txt` shows:
+	 
 	 - Each row is the results of a failing test
 	 - By collumns, the numbers of method calls, individual methods (the results of the first approach) and the number of methods after I applied the second approach
-	 For example: In the first failing test of the first buggy version, there ar 3077 method calls, and 258 methods executed, and there are 78 methods that actually relate to the failing test.
+
+For example: In the first failing test of the first buggy version, there ar 3077 method calls, and 258 methods executed, and there are 78 methods that actually relate to the failing test.
 
 
 
