@@ -67,6 +67,8 @@ Void: edu.utd.Test.main`
 Run my project
 ----------------
 
+0. Clone and build this project (using Maven)
+
 1. Build customized Phosphor jar file
   - `cd PATH_TO_PHOSPHOR/Phosphor`
   - `mvn package`
