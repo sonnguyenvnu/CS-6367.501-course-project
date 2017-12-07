@@ -1,6 +1,7 @@
 CS-6367.501-course-project - Fault Localization
 ----------------
 The implementation of software testing, V&amp;V course project
+
 Requirements
 ----------------
  - Java >= 1.7
@@ -9,6 +10,7 @@ Requirements
  - Git >= 1.9
  - SVN >= 1.8
  - Only on Mac or Linux (Sorry Windows)
+ 
 Defects4J
 ----------------
 #### Setting up Defects4J (From https://github.com/rjust/defects4j)
