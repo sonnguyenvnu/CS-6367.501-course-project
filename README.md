@@ -85,7 +85,7 @@ Run my project
  
 4. Set up configurable variables in Config.java (`PHOSPHOR=false/true` if you want to run approach 1 or approach 2)
 
-5. Run PreProcess to update `pom.xml` files: Junit 4.11, Maven Surefire 2.19, and Java Agent
+5. Run `edu.utd.preprocess.PreProcess` to update `pom.xml` files in buggy versions: Junit 4.11, Maven Surefire 2.19, and Java Agent
 
 6. Run Maven test for all buggy version to collect test information (if you do not use my buggy versions)
   
